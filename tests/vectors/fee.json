@@ -1,0 +1,9 @@
+[
+  { "name": "zero fee", "amount": "10000", "bps": 0, "fee": "0", "totalDebit": "10000" },
+  { "name": "25 bps exact", "amount": "40000", "bps": 25, "fee": "100", "totalDebit": "40100" },
+  { "name": "ceil rounding", "amount": "10001", "bps": 25, "fee": "26", "totalDebit": "10027" },
+  { "name": "one unit rounds up", "amount": "1", "bps": 1, "fee": "1", "totalDebit": "2" },
+  { "name": "u64 max with zero fee", "amount": "18446744073709551615", "bps": 0, "fee": "0", "totalDebit": "18446744073709551615" },
+  { "name": "total debit overflow", "amount": "18446744073709551615", "bps": 1, "error": "overflow" },
+  { "name": "bps above maximum", "amount": "1000", "bps": 10001, "error": "invalid_limits" }
+]

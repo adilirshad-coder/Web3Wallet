@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.86.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.15.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install native build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev libudev-dev pkg-config zlib1g-dev llvm clang cmake make libprotobuf-dev protobuf-compiler libclang-dev
+
+      - name: Install pinned Agave CLI and SBF toolchain
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v3.1.10/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - name: Install Anchor CLI 1.0.3
+        run: cargo install --git https://github.com/otter-sec/anchor --tag v1.0.3 anchor-cli --locked
+
+      - name: Install pinned npm
+        run: npm install --global npm@11.19.0
+
+      - name: Verify pinned toolchains
+        run: |
+          rustc --version
+          test "$(rustc --version | awk '{print $2}')" = "1.86.0"
+          node --version
+          test "$(node --version)" = "v22.15.0"
+          npm --version
+          test "$(npm --version)" = "11.19.0"
+          solana --version
+          solana --version | grep -q '3.1.10'
+          cargo build-sbf --version
+          cargo build-sbf --version | grep -q '3.1.10'
+          anchor --version
+          anchor --version | grep -q '1.0.3'
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build SDK and services
+        run: npm run build
+
+      - name: Test SDK and services
+        run: npm test
+
+      - name: Rust unit tests
+        run: cargo test --locked -p wallet
+
+      - name: Build wallet SBF from source
+        run: anchor build --ignore-keys
+
+      - name: Verify fresh artifact and program IDs
+        run: node scripts/verify-program-build.mjs --allow-missing-keypair
+
+      - name: Run Anchor integration tests on the local validator
+        shell: bash
+        run: |
+          set -euo pipefail
+          authority="$RUNNER_TEMP/wallet-test-authority.json"
+          solana-keygen new --silent --no-bip39-passphrase --outfile "$authority" >/dev/null 2>&1
+          authority_pubkey="$(solana-keygen pubkey "$authority")"
+          program_id="$(node -p "require('./target/idl/wallet.json').address")"
+          solana-test-validator \
+            --reset \
+            --ledger "$RUNNER_TEMP/wallet-ledger" \
+            --rpc-port 8899 \
+            --upgradeable-program "$program_id" target/deploy/wallet.so "$authority_pubkey" \
+            > "$RUNNER_TEMP/solana-test-validator.log" 2>&1 &
+          validator_pid=$!
+          trap 'kill "$validator_pid" 2>/dev/null || true; wait "$validator_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --silent --fail http://127.0.0.1:8899 \
+              -H 'Content-Type: application/json' \
+              --data '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' | grep -q 'ok'; then
+              break
+            fi
+            if [ "$attempt" -eq 60 ]; then
+              cat "$RUNNER_TEMP/solana-test-validator.log"
+              exit 1
+            fi
+            sleep 1
+          done
+          ANCHOR_WALLET="$authority" \
+          ANCHOR_PROVIDER_URL="http://127.0.0.1:8899" \
+            npm run test:program
+
+      - name: Upload validator logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solana-test-validator-log
+          path: ${{ runner.temp }}/solana-test-validator.log
+          if-no-files-found: ignore

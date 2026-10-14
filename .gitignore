@@ -1,0 +1,10 @@
+target/
+dist/
+node_modules/
+test-ledger/
+.anchor/
+/.keys
+*.log
+.env
+.env.*
+!.env.example
