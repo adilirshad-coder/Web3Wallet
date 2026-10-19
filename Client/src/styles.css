@@ -1,0 +1,109 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface-low: var(--surface-low);
+  --color-surface-high: var(--surface-high);
+  --color-surface-lowest: var(--surface-lowest);
+  --color-violet: var(--violet);
+  --color-cyan: var(--cyan);
+  --color-success: var(--success);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.17 0.012 265);
+  --foreground: oklch(0.91 0.008 265);
+  --card: oklch(0.21 0.012 265);
+  --card-foreground: oklch(0.91 0.008 265);
+  --popover: oklch(0.24 0.012 265);
+  --popover-foreground: oklch(0.91 0.008 265);
+  --primary: oklch(0.85 0.19 158);
+  --primary-foreground: oklch(0.25 0.06 158);
+  --secondary: oklch(0.27 0.012 265);
+  --secondary-foreground: oklch(0.91 0.008 265);
+  --muted: oklch(0.25 0.012 265);
+  --muted-foreground: oklch(0.8 0.03 155);
+  --accent: oklch(0.29 0.014 265);
+  --accent-foreground: oklch(0.91 0.008 265);
+  --destructive: oklch(0.82 0.1 25);
+  --destructive-foreground: oklch(0.25 0.08 25);
+  --border: oklch(0.35 0.025 155 / 50%);
+  --input: oklch(0.35 0.025 155 / 60%);
+  --ring: oklch(0.85 0.19 158);
+  --surface-lowest: oklch(0.14 0.01 265);
+  --surface-low: oklch(0.2 0.01 265);
+  --surface-high: oklch(0.27 0.012 265);
+  --violet: oklch(0.82 0.11 300);
+  --cyan: oklch(0.83 0.11 230);
+  --success: oklch(0.85 0.19 158);
+  --gradient-cta: linear-gradient(90deg, oklch(0.85 0.1 300), oklch(0.85 0.19 158));
+  --gradient-panel: radial-gradient(120% 80% at 100% 0%, oklch(0.3 0.08 300 / 45%), transparent 60%);
+  --shadow-glow: 0 0 32px oklch(0.85 0.19 158 / 25%);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+}
+
+@utility panel {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) + 8px);
+}
+@utility panel-glow {
+  background-image: var(--gradient-panel);
+}
+@utility bg-cta {
+  background-image: var(--gradient-cta);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Wallet adapter button themed to tokens */
+.wallet-adapter-button.wallet-adapter-button-trigger {
+  background: var(--color-surface-high);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+}
+.wallet-adapter-modal-wrapper { background: var(--color-card); }
