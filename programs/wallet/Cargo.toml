@@ -1,0 +1,29 @@
+[package]
+name = "wallet"
+version = "0.1.0"
+description = "Custodial Solana wallet program"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "wallet"
+
+[features]
+no-entrypoint = []
+no-idl = []
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+no-log-ix-name = []
+solana = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "1.0.3"
+anchor-spl = { version = "1.0.3", features = ["associated_token", "token", "token_2022"] }
+
+[dev-dependencies]
+serde_json = "1.0.151"
+

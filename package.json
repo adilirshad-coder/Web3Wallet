@@ -1,0 +1,31 @@
+{
+  "name": "solana-wallet-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build --workspace=sdk && npm run build --workspace=services && npm run build --workspace=api",
+    "test": "npm run test --workspace=sdk && npm run test --workspace=services && npm run test:api",
+    "test:api": "npm run test --workspace=api",
+    "openapi": "npm run openapi --workspace=api",
+    "build:program": "anchor build",
+    "test:rust": "cargo test --locked -p wallet",
+    "test:program": "node scripts/verify-program-build.mjs --allow-missing-keypair && node tests/program/run.mjs"
+  },
+  "workspaces": [
+    "sdk",
+    "services",
+    "api"
+  ],
+  "devDependencies": {
+    "@anchor-lang/core": "^1.2.1",
+    "@solana/spl-token": "^0.4.15",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.5",
+    "chai": "^6.3.0",
+    "mocha": "^11.8.0",
+    "ts-mocha": "^11.1.0",
+    "typescript": "^5.9.3"
+  }
+}

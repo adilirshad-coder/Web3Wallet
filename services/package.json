@@ -1,0 +1,17 @@
+{
+  "name": "@web3wallet/services",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node ../scripts/run-node-tests.mjs ../tests/services/onramp.test.js"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "@types/node": "^22.15.30"
+  }
+}
